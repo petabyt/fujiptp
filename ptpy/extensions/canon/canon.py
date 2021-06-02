@@ -205,6 +205,7 @@ class Canon(EOSPropertiesMixin, object):
             EOSAfCancel=0x9160,
             EOSFAPIMessageTX=0x91FE,
             EOSFAPIMessageRX=0x91FF,
+            EOSSendCanonMessage=0x9052,
             **product_operations
         )
 
@@ -702,6 +703,22 @@ class Canon(EOSPropertiesMixin, object):
             Parameter=[code]
         )
         response = self.mesg(ptp)
+        return response
+
+    def eos_run_command(self, string):
+        '''Run a shell command from EOS'''
+        ptp = Container(
+            OperationCode='EOSSendCanonMessage',
+            SessionID=self._session,
+            TransactionID=self._transaction,
+            Parameter=[],
+            # Noise??
+            #Parameter=[1650552389, 1866622316, 1766093935, 16804723, 33554432],
+            #Parameter=[1634953540, 1113943138, 1148481391, 7041897, 1],
+            Type=2,
+        )
+        
+        response = self.send(ptp, string.encode())
         return response
 
     def eos_event_mode(self, mode):
