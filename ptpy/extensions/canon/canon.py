@@ -706,18 +706,21 @@ class Canon(EOSPropertiesMixin, object):
         return response
 
     def eos_run_command(self, string):
-        '''Run a shell command from EOS'''
+        '''Run a prodecure command from DryOS Shell (0x9052)'''
         ptp = Container(
             OperationCode='EOSSendCanonMessage',
             SessionID=self._session,
             TransactionID=self._transaction,
             Parameter=[],
-            # Noise??
+            # Noise? EOS command works fine without it.
             #Parameter=[1650552389, 1866622316, 1766093935, 16804723, 33554432],
             #Parameter=[1634953540, 1113943138, 1148481391, 7041897, 1],
+            
+            # Not sure if this is needed or not, but works with it
             Type=2,
         )
         
+        # Send the string as bytes into the payload
         response = self.send(ptp, string.encode())
         return response
 
