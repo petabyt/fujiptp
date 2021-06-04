@@ -1,4 +1,13 @@
-// Decode PTP packets from Canon software
+/*
+Decode PTP packets from Canon software
+
+My result:
+  Length: 55
+  Type: 2
+  Code: 36946 (0x9052)
+  Transfer ID: 110
+  Payload Data: EnableBootDisk
+*/
 
 #include <stdio.h>
 
@@ -9,7 +18,7 @@ void decodeBulkContainer(char file[]) {
 
 	// Get 12 bytes before payload data
 	FILE *f = fopen(file, "r");
-	fread(&a, 1, 350, f);
+	fread(&a, 1, sizeof(PTPUSBBulkContainer), f);
 	fclose(f);
 
 	puts("Enable boot disk bulk container:");
