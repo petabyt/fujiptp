@@ -6,10 +6,11 @@ git clone https://github.com/petabyt/sequoia-ptpy
 cd sequoia-ptpy
 pip3 install .
 ```
+Make sure camera is not mounted. I would recommend removing SD card
+first.  
 
 Keep running `python3 bootdisk.py` until you get ResponseCode OK.  
-It may take 50-30 attempts because of timing issues (?). In half of  
-those attempts, the camera might crash with Err 70. Just remove the battery,  
+The camera might crash with Err 70. Just remove the battery,  
 and try again.  
 
 I've been able to disable/enable boot disk on 1300D a few times with it.  
