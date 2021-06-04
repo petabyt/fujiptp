@@ -23,9 +23,8 @@ with camera.session():
             result = camera.eos_run_command(command)
             print(result)
             if result.ResponseCode == "OK":
-                print("DryOS command run successfully, if no errors.")
+                print("DryOS command run successfully.")
                 break
             else:
-                print("Bad ResponseCode. Turn off the camera and try again.")
-                print("Will keep running.")
+                print("Bad ResponseCode. Will keep trying.")
 
