@@ -19,3 +19,8 @@ Initial changes from original: https://github.com/petabyt/sequoia-ptpy/commit/54
 
 I doubt this will break your camera, but if it does, then you  
 get to keep both pieces.  
+
+## TODO:
+It crashes because of timing issues.  
+Finishing this could possibly fix it:  
+https://github.com/petabyt/sequoia-ptpy/blob/abf0004d608c069cc40e29da8903718e29950524/ptpy/extensions/canon/canon.py#L956
