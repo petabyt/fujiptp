@@ -713,16 +713,19 @@ class Canon(EOSPropertiesMixin, object):
             SessionID=self._session,
             TransactionID=self._transaction,
             Parameter=[],
-            # EnableBootDisk parameters seem to be just noise
+            # EnableBootDisk parameters seem to be just noise (?)
             #Parameter=[1650552389, 1866622316, 1766093935, 16804723, 33554432],
             #Parameter=[1634953540, 1113943138, 1148481391, 7041897, 1],
-            
-            # Not sure if this is needed or not, but works with it
-            Type=2,
         )
         
-        # Send the string as bytes into the payload
-        response = self.send(ptp, string.encode())
+        # Who knows what this is...
+        # Only works with it. And no, it's not a null terminator.
+        ending = bytes([0,1,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,88,115,105,96,110,193,9,0,27,0,0,0])
+
+        # Generate a final command with the ending
+        command = string.encode() + ending
+
+        response = self.send(ptp, command)
         return response
 
     def eos_pre_command(self,):
