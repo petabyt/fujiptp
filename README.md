@@ -1,32 +1,33 @@
 ## sequoia-ptpy modified to attempt enabling boot flag for Canon DSLRs.  
 
+**I doubt this will break your camera, but if it does, then you  
+get to keep both pieces.**
+
 # Test
+
 ```
 git clone https://github.com/petabyt/sequoia-ptpy
 cd sequoia-ptpy
 pip3 install .
 ```
+
 Make sure camera is not mounted. I would recommend removing SD card
 first, so it doesn't automatically mount.  
 
-Keep running `python3 bootdisk.py` until you get ResponseCode OK.  
-The camera might crash with Err 70. Just remove the battery,  
-and try again.  
+Run `python3 bootdisk.py`.
 
-I've been able to disable/enable boot disk on 1300D a few times with it.  
+# Major Revisions
 
-Initial changes from original: https://github.com/petabyt/sequoia-ptpy/commit/54a4acc3ff5614215a8cc97e02af42fcb6a765af  
-The rest are minor edits and stability fixes.
+Initial attempt, crashed:  
+https://github.com/petabyt/sequoia-ptpy/commit/54a4acc3ff5614215a8cc97e02af42fcb6a765af  
 
-I doubt this will break your camera, but if it does, then you  
-get to keep both pieces.  
-
-## TODO:
-It crashes because of timing issues. Finishing this could possibly fix it:  
-https://github.com/petabyt/sequoia-ptpy/blob/abf0004d608c069cc40e29da8903718e29950524/ptpy/extensions/canon/canon.py#L956
+Fixed crash by adding extra bytes to string:
+https://github.com/petabyt/sequoia-ptpy/commit/b5d493b3cb3804e01c40c97213ebc78b63da095d
 
 # PTP Decoder
+
 I wrote a PTP decoder for reverse-engineering PTP USB output.  
+See `main.c`, and mess with the filters.  
 ```
 make ptp f=usbdump.bin
 ```

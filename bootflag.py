@@ -3,28 +3,13 @@ import ptpy
 from ptpy import Canon
 from time import sleep
 
-# Commands to try:
-# EnableBootDisk
-# DisableBootDisk
-# TurnOffDisplay
-
-command = "EnableBootDisk"
-
 camera = ptpy.PTPy()
 
 print("Connected to the camera...")
 
 with camera.session():
-    #print("You can kill the script (ctrl+z) if you get timeouts.")
-    print("Waiting for a good time to send command...")
-    while True:
-        evt = camera.event()
-        if not evt:
-            result = camera.eos_run_command(command)
-            print(result)
-            if result.ResponseCode == "OK":
-                print("DryOS command run successfully.")
-                break
-            else:
-                print("Bad ResponseCode. Will keep trying.")
-
+    result = camera.eos_run_command("EnableBootDisk")
+    if result.ResponseCode == 'OK':
+        print("Boot flag enabled.")
+    else:
+        print("Error running command")

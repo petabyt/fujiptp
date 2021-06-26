@@ -206,7 +206,7 @@ class Canon(EOSPropertiesMixin, object):
             EOSFAPIMessageTX=0x91FE,
             EOSFAPIMessageRX=0x91FF,
             EOSSendCanonMessage=0x9052,
-            EOSSendName=0x9053,
+            EOSProcReturnData=0x9053,
             **product_operations
         )
 
@@ -713,7 +713,7 @@ class Canon(EOSPropertiesMixin, object):
             SessionID=self._session,
             TransactionID=self._transaction,
             Parameter=[],
-            # EnableBootDisk parameters seem to be just noise (?)
+            # EnableBootDisk parameters seem to be just noise
             #Parameter=[1650552389, 1866622316, 1766093935, 16804723, 33554432],
             #Parameter=[1634953540, 1113943138, 1148481391, 7041897, 1],
         )
@@ -728,29 +728,16 @@ class Canon(EOSPropertiesMixin, object):
         response = self.send(ptp, command)
         return response
 
-    def eos_pre_command(self,):
-        '''This is a test'''
-        ptp = Container(
-            OperationCode='EOSSendCanonMessage',
-            SessionID=self._session,
-            TransactionID=self._transaction,
-            Parameter=[0, 1, 0x60697312],
-            Type=1,
-        )
-        
-        response = self.send(ptp, "".encode())
-        return response
-
     def eos_return_command(self):
-        '''Some other thing, sends camera name (0x9053) GetEventProcReturnData'''
+        '''Some other thing (0x9053) EOSProcReturnData'''
         ptp = Container(
-            OperationCode='EOSSendName',
+            OperationCode='EOSProcReturnData',
             SessionID=self._session,
             TransactionID=self._transaction,
             Parameter=[]
         )
         
-        # Send the string as bytes into the payload
+        # Send the string as bytes into the payload (?)
         response = self.recv(ptp)
         return response
 
