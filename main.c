@@ -1,40 +1,144 @@
-/*
-Decode PTP packets from Canon software
-
-My result:
-  Length: 55
-  Type: 2
-  Code: 36946 (0x9052)
-  Transfer ID: 110
-  Payload Data: EnableBootDisk
-*/
+// Decode PTP packets from Canon software
 
 #include <stdio.h>
-
 #include "ptp.h"
 
-void decodeBulkContainer(char file[]) {
+#define HEXDATA
+
+unsigned short code = 0;
+unsigned short type = 0;
+unsigned int transid = 0;
+
+int print = 1;
+
+void decodeBulkContainer(FILE *f) {
 	PTPUSBBulkContainer a;
 
 	// Get 12 bytes before payload data
-	FILE *f = fopen(file, "r");
-	fread(&a, 1, sizeof(PTPUSBBulkContainer), f);
-	fclose(f);
+	fread(&a, 1, sizeof(a), f);
 
-	puts("Enable boot disk bulk container:");
-	printf("Length: %u\n", a.length);
-	printf("Type: %hu\n", a.type);
-	printf("Code: %hu (0x%x)\n", a.code, a.code);
-	printf("Transfer ID: %u\n", a.trans_id);
-	printf("Payload Data: %s\n", a.payload.data);
-	printf("Param: %d\n", a.payload.params.param1);
-	printf("Param: %d\n", a.payload.params.param2);
-	printf("Param: %d\n", a.payload.params.param3);
-	printf("Param: %d\n", a.payload.params.param4);
-	printf("Param: %d\n", a.payload.params.param5);
-	putchar('\n');
+	if (print) {
+		printf("Length: %u\n", a.length);
+		printf("Type: %hu\n", a.type);
+		printf("Code: %hu (0x%x)\n", a.code, a.code);
+		printf("Transfer ID: %u\n", a.trans_id);
+		printf("Param: 0x%x\n", a.payload.params.param1);
+		printf("Param: 0x%x\n", a.payload.params.param2);
+		printf("Param: 0x%x\n", a.payload.params.param3);
+		printf("Param: 0x%x\n", a.payload.params.param4);
+		printf("Param: 0x%x\n", a.payload.params.param5);
+		printf("Payload Data in hex: '");
+		for (int i = 0; i < (int)(a.length); i++) {
+			printf("%x ", a.payload.data[i]);
+		}
+
+		printf("'\n");
+
+		printf("Payload Data: '%s'\n", a.payload.data);
+		putchar('\n');
+	}
+
+	code = a.code;
+	type = a.type;
+	transid = a.trans_id;
 }
 
-int main() {
-	decodeBulkContainer("enable");
+//PTPUSBEventContainer
+
+void decodeEventContainer(FILE *f) {
+	PTPUSBEventContainer a;
+
+
+	fread(&a, 1, sizeof(a), f);
+
+	if (print) {
+		printf("Length: %u\n", a.length);
+		printf("Type: %hu\n", a.type);
+		printf("Code: %hu (0x%x)\n", a.code, a.code);
+		printf("Transfer ID: %u\n", a.trans_id);
+		printf("Param: 0x%x\n", a.param1);
+		printf("Param: 0x%x\n", a.param2);
+		printf("Param: 0x%x\n", a.param3);
+		putchar('\n');
+	}
+
+	code = a.code;
+	type = a.type;
+	transid = a.trans_id;
+}
+
+void decodeContainer(FILE *f) {
+	PTPContainer a;
+
+	fread(&a, 1, sizeof(a), f);
+
+	if (print) {
+		printf("Code: %hu (0x%x)\n", a.Code, a.Code);
+		printf("Session ID: %u\n", a.SessionID);
+		printf("Transaction ID: %u\n", a.Transaction_ID);
+		printf("Param: 0x%x\n", a.Param1);
+		printf("Param: 0x%x\n", a.Param2);
+		printf("Param: 0x%x\n", a.Param3);
+		printf("Param: 0x%x\n", a.Param4);
+		printf("Param: 0x%x\n", a.Param5);
+		printf("NParam: %d\n", (char)a.Nparam);
+		putchar('\n');
+	}
+
+	code = a.Code;
+	type = 0;
+	transid = a.Transaction_ID;
+}
+
+#define CURTEST decodeBulkContainer
+
+int main(int argc, char *argv[]) {
+	if (argc != 2) {
+		return 1;
+	}
+
+	// Don't print
+	print = 0;
+
+	// Where to store matched addresses
+	unsigned long addrs[1000];
+	int addrlen = 0;
+
+	FILE *f = fopen(argv[1], "r");
+
+	// Read through file, find matches
+	int i = 0;
+	while (!feof(f)) {
+		fseek(f, i, SEEK_SET);
+		CURTEST(f);
+
+		// Looking for 0x90* calls
+		if (code >> 8 == 0x90) {
+			// Avoid too high transaction IDs
+			// (Typically 0-300)
+			if (transid < 1000) {
+				addrs[addrlen] = i;
+				addrlen++;
+			}
+		}
+		
+		i++;
+	}
+
+	print = 1;
+
+	if (addrlen == 0) {
+		puts("!!!!! No matches found");
+	}
+
+	for (int i = 0; i < addrlen; i++) {
+		printf("\n!!!!! Offset: %ld\n", addrs[i]);
+		fseek(f, addrs[i], SEEK_SET);
+		CURTEST(f);
+	}
+
+	fclose(f);
+	
+	//decodeContainer(f);
+	//decodeBulkContainer(f);
 }
