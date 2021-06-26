@@ -31,3 +31,7 @@ See `main.c`, and mess with the filters.
 ```
 make ptp f=usbdump.bin
 ```
+
+# TODO:
+- Use pyinstaller to make windows, linux, macos app
+- Make android app to enable boot disk and install ML???
