@@ -1,12 +1,12 @@
-install:
-	python setup.py install
+f ?= ~/Documents/1300d/1300ddump
 
-test:
-	python setup.py test
+run:
+	@python3 bootdisk.py
 
-distribute:
-	python setup.py sdist upload --identity="26B1FA94" --sign
-  workon ptpy
-	python setup.py bdist_wheel upload --identity="26B1FA94" --sign
-  workon ptpy3
-	python setup.py bdist_wheel upload --identity="26B1FA94" --sign
+build:
+	@pip3 install .
+
+ptp:
+	@${CC} main.c -o main.o
+	@./main.o ${f}
+	@rm -rf *.o *.out
