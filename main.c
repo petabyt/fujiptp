@@ -8,6 +8,7 @@
 unsigned short code = 0;
 unsigned short type = 0;
 unsigned int transid = 0;
+unsigned int nparam = 0;
 
 int print = 1;
 
@@ -43,11 +44,8 @@ void decodeBulkContainer(FILE *f) {
 	transid = a.trans_id;
 }
 
-//PTPUSBEventContainer
-
 void decodeEventContainer(FILE *f) {
 	PTPUSBEventContainer a;
-
 
 	fread(&a, 1, sizeof(a), f);
 
@@ -88,8 +86,10 @@ void decodeContainer(FILE *f) {
 	code = a.Code;
 	type = 0;
 	transid = a.Transaction_ID;
+	nparam = a.Nparam;
 }
 
+// Current search packet target
 #define CURTEST decodeBulkContainer
 
 int main(int argc, char *argv[]) {
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 	print = 0;
 
 	// Where to store matched addresses
-	unsigned long addrs[1000];
+	int addrs[100000];
 	int addrlen = 0;
 
 	FILE *f = fopen(argv[1], "r");
@@ -112,14 +112,17 @@ int main(int argc, char *argv[]) {
 		fseek(f, i, SEEK_SET);
 		CURTEST(f);
 
-		// Looking for 0x90* calls
-		if (code >> 8 == 0x90) {
-			// Avoid too high transaction IDs
-			// (Typically 0-300)
-			if (transid < 1000) {
-				addrs[addrlen] = i;
-				addrlen++;
-			}
+		int filter = 1;
+
+		// Look for Canon calls
+		filter &= code >> 8 == 0x90 || code >> 8 == 0x91;
+
+		// Avoid too high transaction IDs (Typically 0-300)
+		filter &= transid < 300;
+
+		if (filter) {
+			addrs[addrlen] = i;
+			addrlen++;
 		}
 		
 		i++;
@@ -132,13 +135,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	for (int i = 0; i < addrlen; i++) {
-		printf("\n!!!!! Offset: %ld\n", addrs[i]);
+		printf("\n!!!!! Offset: %d\n", addrs[i]);
 		fseek(f, addrs[i], SEEK_SET);
 		CURTEST(f);
 	}
 
 	fclose(f);
-	
-	//decodeContainer(f);
-	//decodeBulkContainer(f);
 }
