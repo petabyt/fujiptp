@@ -1,6 +1,6 @@
-sequoia-ptpy modified to attempt enabling boot flag for Canon DSLRs.  
+## sequoia-ptpy modified to attempt enabling boot flag for Canon DSLRs.  
 
-## Install, Test
+# Test
 ```
 git clone https://github.com/petabyt/sequoia-ptpy
 cd sequoia-ptpy
@@ -24,3 +24,9 @@ get to keep both pieces.
 ## TODO:
 It crashes because of timing issues. Finishing this could possibly fix it:  
 https://github.com/petabyt/sequoia-ptpy/blob/abf0004d608c069cc40e29da8903718e29950524/ptpy/extensions/canon/canon.py#L956
+
+# PTP Decoder
+I wrote a PTP decoder for reverse-engineering PTP USB output.  
+```
+make ptp f=usbdump.bin
+```
