@@ -712,15 +712,12 @@ class Canon(EOSPropertiesMixin, object):
             OperationCode='EOSSendCanonMessage',
             SessionID=self._session,
             TransactionID=self._transaction,
-            Parameter=[],
-            # EnableBootDisk parameters seem to be just noise
-            #Parameter=[1650552389, 1866622316, 1766093935, 16804723, 33554432],
-            #Parameter=[1634953540, 1113943138, 1148481391, 7041897, 1],
+            Parameter=params,
         )
         
-        # Who knows what this is...
-        # Only works with it. And no, it's not a null terminator.
-        ending = bytes([0,1,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,88,115,105,96,110,193,9,0,27,0,0,0])
+        # I am not entirely sure what this is, but the camera will crash and
+        # time out without generous zero padding.
+        ending = bytesarray(30)
 
         # Generate a final command with the ending
         command = string.encode() + ending
@@ -728,13 +725,13 @@ class Canon(EOSPropertiesMixin, object):
         response = self.send(ptp, command)
         return response
 
-    def eos_return_command(self):
+    def eos_return_command(self, params=[]):
         '''Some other thing (0x9053) EOSProcReturnData'''
         ptp = Container(
             OperationCode='EOSProcReturnData',
             SessionID=self._session,
             TransactionID=self._transaction,
-            Parameter=[]
+            Parameter=params
         )
         
         # Send the string as bytes into the payload (?)
