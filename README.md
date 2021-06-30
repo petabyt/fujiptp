@@ -1,8 +1,11 @@
-## sequoia-ptpy modified to attempt enabling boot flag for Canon DSLRs.  
+## sequoia-ptpy research
 
-**This is not garunteed to be safe - Keep both pieces if you brick anything.**
+Using sequoia-ptpy to enable Canon boot flag, and a few other tests.  
 
-# Test
+**This is not garunteed to be safe or not brick yoru camera -  
+run at your own risk**
+
+# Run
 
 ```
 git clone https://github.com/petabyt/sequoia-ptpy
@@ -14,6 +17,9 @@ Make sure camera is not mounted. I would recommend removing SD card
 first, so it doesn't automatically mount.  
 
 Run `python3 bootdisk.py`.
+
+# Testing:
+- 1300D: ~100 stress tests, worked fine  
 
 # Major Revisions
 
@@ -33,11 +39,10 @@ make ptp f=usbdump.bin
 
 # How it works
 This uses an undocumented Canon PTP command (`0x9052`) found via  
-reverse engineering. This command allows DryOS eventprocs like `EnableBootDisk`  
-to be run via USB rather than UART.
+reverse engineering Canon software. This command allows DryOS shell  
+commands like `EnableBootDisk` to be run via USB/PTP rather than UART.  
 
 # Windows, Linux portable front-end
-
 I've written a portable front end UI app for this. I've tested it  
-on Windows and Linux.  
+on Windows and Linux:  
 https://github.com/petabyt/mlinstall
