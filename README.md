@@ -39,7 +39,7 @@ make ptp f=usbdump.bin
 
 # How it works
 This uses an undocumented Canon PTP command (`0x9052`) found via  
-reverse engineering Canon software. This command allows DryOS shell  
+reverse engineering Canon software. This command allows Canon "eventproc"  
 commands like `EnableBootDisk` to be run via USB/PTP rather than UART.  
 
 # Windows, Linux portable front-end
