@@ -2,7 +2,7 @@
 
 Using sequoia-ptpy to enable Canon boot flag, and a few other tests.  
 
-**This is not garunteed to be safe or not brick yoru camera -  
+**This is not garunteed to be safe or not brick your camera -  
 run at your own risk**
 
 # Run
