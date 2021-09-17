@@ -717,7 +717,7 @@ class Canon(EOSPropertiesMixin, object):
         
         # I am not entirely sure what this is, but the camera will crash and
         # time out without generous zero padding.
-        ending = bytesarray(30)
+        ending = bytearray(30)
 
         # Generate a final command with the ending
         command = string.encode() + ending
