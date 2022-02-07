@@ -43,7 +43,7 @@ class Canon(EOSPropertiesMixin, object):
         # Within a normal PTP session
         with super(Canon, self).session():
             # Set up remote mode and extended event info
-            self.eos_set_remote_mode(1) # this crashes sx740
+            self.eos_set_remote_mode(1)
             self.eos_event_mode(1)
             # And launch a polling thread
             self.__event_queue = Queue()
@@ -208,8 +208,6 @@ class Canon(EOSPropertiesMixin, object):
             EOSFAPIMessageRX=0x91FF,
             EOSSendCanonMessage=0x9052,
             EOSProcReturnData=0x9053,
-            EOSIsEventProcRunning=0x9057,
-            EOSEnableCommand=0x9050,
             **product_operations
         )
 
@@ -721,28 +719,22 @@ class Canon(EOSPropertiesMixin, object):
         response = self.mesg(ptp)
         return response
 
-    def eos_enable_command(self):
-        '''Enable handlers 0x9052, 0x9053 and more'''
-        ptp = Container(
-            OperationCode='EOSEnableCommand',
-            SessionID=self._session,
-            TransactionID=self._transaction,
-            Parameter=[]
-        )
-        response = self.mesg(ptp)
-        return response
-
-    def eos_run_command(self, command, _async, retdata):
+    def eos_run_command(self, string, params=[]):
         '''Run a prodecure command from DryOS Shell (0x9052)'''
         ptp = Container(
             OperationCode='EOSSendCanonMessage',
             SessionID=self._session,
             TransactionID=self._transaction,
-            # 1st parameter: set nonzero for async execution
-            # 2nd parameter: set nonzero when return data is generated
-            Parameter=[_async, retdata]
+            Parameter=params,
         )
-        # command contains bytes object encoding the command and its arguments
+        
+        # I am not entirely sure what this is, but the camera will crash and
+        # time out without generous zero padding.
+        ending = bytearray(30)
+
+        # Generate a final command with the ending
+        command = string.encode() + ending
+
         response = self.send(ptp, command)
         return response
 
@@ -757,18 +749,6 @@ class Canon(EOSPropertiesMixin, object):
         
         # Send the string as bytes into the payload (?)
         response = self.recv(ptp)
-        return response
-
-    def eos_command_info(self, params=[]):
-        '''Returns information about most recent command in up to 3 params (0x9057) '''
-        ptp = Container(
-            OperationCode='EOSIsEventProcRunning',
-            SessionID=self._session,
-            TransactionID=self._transaction,
-            Parameter=params
-        )
-        
-        response = self.mesg(ptp)
         return response
 
     def eos_event_mode(self, mode):
